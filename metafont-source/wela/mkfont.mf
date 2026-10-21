@@ -1,1 +1,0 @@
-fontmaking:=1; proofing:=0; input wela14; end;
