@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Schulschriften Entenmann – Preview</title>
+<style>
+  /* 5 families x RIBBI, all faces under ./faces/ */
+  @font-face{font-family:"Suetterlinschrift Entenmann";font-weight:400;font-style:normal;src:url("faces/entenmann-su-regular.woff2") format("woff2")}
+  @font-face{font-family:"Suetterlinschrift Entenmann";font-weight:700;font-style:normal;src:url("faces/entenmann-su-bold.woff2") format("woff2")}
+  @font-face{font-family:"Suetterlinschrift Entenmann";font-weight:400;font-style:italic;src:url("faces/entenmann-su-italic.woff2") format("woff2")}
+  @font-face{font-family:"Suetterlinschrift Entenmann";font-weight:700;font-style:italic;src:url("faces/entenmann-su-bold-italic.woff2") format("woff2")}
+  @font-face{font-family:"Deutsche Normalschrift Entenmann";font-weight:400;font-style:normal;src:url("faces/entenmann-dn-regular.woff2") format("woff2")}
+  @font-face{font-family:"Deutsche Normalschrift Entenmann";font-weight:700;font-style:normal;src:url("faces/entenmann-dn-bold.woff2") format("woff2")}
+  @font-face{font-family:"Deutsche Normalschrift Entenmann";font-weight:400;font-style:italic;src:url("faces/entenmann-dn-italic.woff2") format("woff2")}
+  @font-face{font-family:"Deutsche Normalschrift Entenmann";font-weight:700;font-style:italic;src:url("faces/entenmann-dn-bold-italic.woff2") format("woff2")}
+  @font-face{font-family:"Lateinische Ausgangsschrift Entenmann";font-weight:400;font-style:normal;src:url("faces/entenmann-la-regular.woff2") format("woff2")}
+  @font-face{font-family:"Lateinische Ausgangsschrift Entenmann";font-weight:700;font-style:normal;src:url("faces/entenmann-la-bold.woff2") format("woff2")}
+  @font-face{font-family:"Lateinische Ausgangsschrift Entenmann";font-weight:400;font-style:italic;src:url("faces/entenmann-la-italic.woff2") format("woff2")}
+  @font-face{font-family:"Lateinische Ausgangsschrift Entenmann";font-weight:700;font-style:italic;src:url("faces/entenmann-la-bold-italic.woff2") format("woff2")}
+  @font-face{font-family:"Schulausgangsschrift Entenmann";font-weight:400;font-style:normal;src:url("faces/entenmann-sas-regular.woff2") format("woff2")}
+  @font-face{font-family:"Schulausgangsschrift Entenmann";font-weight:700;font-style:normal;src:url("faces/entenmann-sas-bold.woff2") format("woff2")}
+  @font-face{font-family:"Schulausgangsschrift Entenmann";font-weight:400;font-style:italic;src:url("faces/entenmann-sas-italic.woff2") format("woff2")}
+  @font-face{font-family:"Schulausgangsschrift Entenmann";font-weight:700;font-style:italic;src:url("faces/entenmann-sas-bold-italic.woff2") format("woff2")}
+  @font-face{font-family:"Vereinfachte Ausgangsschrift Entenmann";font-weight:400;font-style:normal;src:url("faces/entenmann-va-regular.woff2") format("woff2")}
+  @font-face{font-family:"Vereinfachte Ausgangsschrift Entenmann";font-weight:700;font-style:normal;src:url("faces/entenmann-va-bold.woff2") format("woff2")}
+  @font-face{font-family:"Vereinfachte Ausgangsschrift Entenmann";font-weight:400;font-style:italic;src:url("faces/entenmann-va-italic.woff2") format("woff2")}
+  @font-face{font-family:"Vereinfachte Ausgangsschrift Entenmann";font-weight:700;font-style:italic;src:url("faces/entenmann-va-bold-italic.woff2") format("woff2")}
+
+  body { font-family: system-ui, sans-serif; margin: 2rem; color:#222 }
+  h1 { margin-bottom: .2rem }
+  .status { margin: .5rem 0 1.5rem; font-weight: 600 }
+  .fam { margin-bottom: 1.6rem; padding-bottom: .8rem; border-bottom: 1px solid #ddd }
+  .fam h2 { margin: 0 0 .4rem; font-size: 1.05rem; font-family: system-ui, sans-serif }
+  .row { font-size: 34px; line-height: 1.7; }
+  .row b { font-weight: 700 }
+  .row i { font-style: italic }
+  .su { font-family: "Suetterlinschrift Entenmann", cursive }
+  .dn { font-family: "Deutsche Normalschrift Entenmann", cursive }
+  .la { font-family: "Lateinische Ausgangsschrift Entenmann", cursive }
+  .sas { font-family: "Schulausgangsschrift Entenmann", cursive }
+  .va { font-family: "Vereinfachte Ausgangsschrift Entenmann", cursive }
+  .glyphs { font-size: 20px; color:#555 }
+</style>
+</head>
+<body>
+<h1>Schulschriften Entenmann</h1>
+<p>Convertiert aus dem CTAN-Paket <code>schulschriften</code> (Walter Entenmann, LPPL). Fünf Schriften &times; Normal / Fett / Kursiv / Fett-Kursiv.</p>
+<div class="status" id="status">Pruefe Font-Ladung…</div>
+
+<div class="fam"><h2>Suetterlinschrift (SU, 1911)</h2>
+  <div class="row su">Liebe Anna, heute schreiben wir Suetterlin. <b>Fett.</b> <i>Kursiv.</i> <b><i>Fettkursiv.</i></b> 0123456789</div>
+  <div class="row su glyphs">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz ÄÖÜäöüß</div></div>
+
+<div class="fam"><h2>Deutsche Normalschrift (DN, 1941)</h2>
+  <div class="row dn">Liebe Anna, heute schreiben wir Normalschrift. <b>Fett.</b> <i>Kursiv.</i> <b><i>Fettkursiv.</i></b> 0123456789</div>
+  <div class="row dn glyphs">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz ÄÖÜäöüß</div></div>
+
+<div class="fam"><h2>Lateinische Ausgangsschrift (LA, 1953)</h2>
+  <div class="row la">Liebe Anna, heute schreiben wir LA. <b>Fett.</b> <i>Kursiv.</i> <b><i>Fettkursiv.</i></b> 0123456789</div>
+  <div class="row la glyphs">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz ÄÖÜäöüß</div></div>
+
+<div class="fam"><h2>Schulausgangsschrift (SAS, 1968)</h2>
+  <div class="row sas">Liebe Anna, heute schreiben wir SAS. <b>Fett.</b> <i>Kursiv.</i> <b><i>Fettkursiv.</i></b> 0123456789</div>
+  <div class="row sas glyphs">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz ÄÖÜäöüß</div></div>
+
+<div class="fam"><h2>Vereinfachte Ausgangsschrift (VA, 1972)</h2>
+  <div class="row va">Liebe Anna, heute schreiben wir VA. <b>Fett.</b> <i>Kursiv.</i> <b><i>Fettkursiv.</i></b> 0123456789</div>
+  <div class="row va glyphs">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz ÄÖÜäöüß</div></div>
+
+<script>
+  var fams = ["Suetterlinschrift Entenmann","Deutsche Normalschrift Entenmann","Lateinische Ausgangsschrift Entenmann","Schulausgangsschrift Entenmann","Vereinfachte Ausgangsschrift Entenmann"];
+  Promise.all(fams.map(function (f) { return document.fonts.load('16px "' + f + '"'); }))
+    .then(function () {
+      var missing = fams.filter(function (f) { return !document.fonts.check('16px "' + f + '"'); });
+      var el = document.getElementById('status');
+      if (missing.length === 0) { el.textContent = 'Alle 5 Familien geladen ✔'; el.style.color = 'green'; }
+      else { el.textContent = 'Fehlt: ' + missing.join(', '); el.style.color = 'red'; }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+Attribution & License Notice
+============================
+
+Web/app fonts in this directory (faces/)
+-----------------------------------------
+Twenty faces, TrueType outlines + WOFF2, unitsPerEm=1000, ~185 glyphs each.
+Five script families, each in the CSS quadruple Regular / Bold / Italic /
+Bold Italic:
+
+  Family (CSS font-family)                 File short   METAFONT source
+  ---------------------------------------  -----------  ---------------
+  "Suetterlinschrift Entenmann"            su           wesu  (Suetterlin, SU 1911)
+  "Deutsche Normalschrift Entenmann"       dn           wedn  (DN, 1941)
+  "Lateinische Ausgangsschrift Entenmann"  la           wela  (LA, 1953)
+  "Schulausgangsschrift Entenmann"         sas          wesa  (SAS, ex-DDR 1968)
+  "Vereinfachte Ausgangsschrift Entenmann" va           weva  (VA, 1972)
+
+Files are named entenmann-<short>-<style>.{ttf,woff2}.
+These are *converted* versions of the "Schulausgangsschriften" METAFONT
+fonts, one German school script per row.
+
+Original font program
+---------------------
+Author:      Walter Entenmann (walter.entenmann@t-online.de)
+Package:     schulschriften, version 5 (CTAN)
+Sources:     https://ctan.org/tex-archive/fonts/schulschriften
+             (a copy of every .mf source is kept in metafont-source/)
+License:     The LaTeX Project Public License (LPPL) version 1.3c,
+             full text in lppl/LPPL.txt.
+             Status: maintained.
+
+Conversion (this work)
+----------------------
+Pipeline (see work/10_build_all.sh, work/11_style_woff2.py):
+  mf (TeX Live 2023, mode lexmarks) -> <driver>.tfm + 1200dpi GF
+  mftrace 1.2.20 (potrace backend, tex256.enc) -> Type 1 (PFA)
+  FontForge 20230101 (ScaleToEm 1000, renamed) -> TTF
+  fontTools 4.46 -> RIBBI name/fsSelection/macStyle + WOFF2
+
+License compliance notes
+------------------------
+* Per LPPL section 6 ("naming integrity requirement"), a Modified Version of
+  the font program may not be distributed under the original name; therefore
+  the converted fonts are renamed to "<script> Entenmann" (e.g. "Lateinische
+  Ausgangsschrift Entenmann") while retaining the author attribution above.
+* The original METAFONT names (wela, wesu, wedn, wesa, weva) remain reserved
+  to the Original Maintainer for the unmodified sources (LPPL section 4).
+* This attribution file and lppl/LPPL.txt ship with the binaries so downstream
+  users can find the Original Source and its license.
+
+Weights & slant (bold / italic)
+-------------------------------
+The source package provides, for each script, a regular pen plus four heavier
+pens selected by the `fetter` variable:
+  sb = semi-bold, bx = bold, eb = extra-bold, ub = ultra-bold
+and an oblique selected by `slant:=0.325` (a true geometric slant, not a
+synthetic skew). Combined weights/slant give the usual 9 style drivers.
+We ship the four most useful as the CSS RIBBI set (regular/bold/italic/
+bold-italic, using bx for "bold" and sl for "italic"). The extra weights
+(sb, eb, ub) and their slants can be produced the same way on request.
+
+Known limitations of the conversion
+-----------------------------------
+* The original font selects word-initial/word-final glyph variants via TeX
+  ligature tables (wela14_lig.mf etc.). TrueType/WOFF cannot replicate that
+  from plain text input; the variants exist as glyphs at their original slot
+  indices but are not substituted automatically. Contextual OpenType rules
+  (calt/liga) could be added later if wanted.
+* Coverage: ASCII plus punctuation present in the source, and
+  A E O U umlauts, a e o u umlauts, sharp s, y-diaeresis. No uppercase
+  accented letters, no non-Latin scripts.
+* Outlines were traced from 1200 dpi bitmaps (potrace); hinting is absent, so
+  small-pixel rendering may look slightly uneven.
