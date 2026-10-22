@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Block edges in the app's own .md-body</title>
+<link rel="stylesheet" href="/src/components/wiki/markdown/markdown.css">
+<style>
+  /* The faces as globals.css declares them, from the freshly built binaries. */
+  @font-face { font-family: "Lateinische Ausgangsschrift Entenmann"; font-weight: 400;
+    src: url("/font/faces/entenmann-la-regular.woff2?v=6") format("woff2"); }
+  @font-face { font-family: "Schulausgangsschrift Entenmann"; font-weight: 400;
+    src: url("/font/faces/entenmann-sas-regular.woff2?v=6") format("woff2"); }
+
+  body { margin: 0; background: #fff; color: #000; font: 13px sans-serif; }
+  .col { display: inline-block; vertical-align: top; width: 560px; padding: 6px 12px; }
+  .cap { font: bold 12px sans-serif; color: #a00; }
+  .md-body { --md-body-font: "Lateinische Ausgangsschrift Entenmann", cursive;
+             --md-body-leading: 1.9; font-size: 30px; background: #fff; }
+  .md-body.sas { --md-body-font: "Schulausgangsschrift Entenmann", cursive; }
+  /* Cancel the app rule to get the "before" half of the comparison. */
+  .noedge :is(p, h1, h2, h3, h4, h5, h6, td, th, li)::before,
+  .noedge :is(p, h1, h2, h3, h4, h5, h6, td, th, li)::after { content: none; }
+  table { border-collapse: collapse; }
+  td, th { border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<div class="col">
+  <div class="cap">no trigger (how a block edge used to render)</div>
+  <div class="md-body noedge" id="tpl"></div>
+</div>
+<div class="col">
+  <div class="cap">with the app's block-edge rule</div>
+  <div class="md-body" id="fix"></div>
+</div>
+<div class="col">
+  <div class="cap">SAS, no trigger</div>
+  <div class="md-body sas noedge" id="tpl2"></div>
+</div>
+<div class="col">
+  <div class="cap">SAS, with rule</div>
+  <div class="md-body sas" id="fix2"></div>
+</div>
+<script>
+// Every block here both starts and ends with a word that has an entry/exit stroke
+// to lose, so the two columns differ at every line edge - and nowhere else.
+var BODY = [
+  '<h2>Sieben geben Papier</h2>',
+  '<p>Sieben Mutter Papier quantitativ Straße Papier.</p>',
+  '<p>Wo ist die Schweiz? Es war ein Thema der Mutter.</p>',
+  '<ul><li>Sieben Mutter Papier</li><li>quantitativ Straße es</li></ul>',
+  '<table><tr><th>Sieben</th><td>Papier Mutter</td></tr>' +
+  '<tr><th>Straße</th><td>es quantitativ</td></tr></table>',
+].join("");
+document.getElementById("tpl").innerHTML = BODY;
+document.getElementById("fix").innerHTML = BODY;
+document.getElementById("tpl2").innerHTML = BODY;
+document.getElementById("fix2").innerHTML = BODY;
+</script>
+</body>
+</html>

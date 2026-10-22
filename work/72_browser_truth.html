@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Browser vs TeX</title>
+<style>
+  /* The point of this page is that a *real* shaper, not my model of one, has to
+     lay the word out the way TeX did. 63_tex_truth.py writes the expected widths;
+     here they are measured with the shipped face at 200px, so one font unit of
+     1000 is 0.2px. */
+  @font-face { font-family: "SU"; src: url("/faces/entenmann-su-regular.woff2?v=4") format("woff2"); }
+  @font-face { font-family: "DN"; src: url("/faces/entenmann-dn-regular.woff2?v=4") format("woff2"); }
+  @font-face { font-family: "LA"; src: url("/faces/entenmann-la-regular.woff2?v=4") format("woff2"); }
+  @font-face { font-family: "SAS"; src: url("/faces/entenmann-sas-regular.woff2?v=4") format("woff2"); }
+  @font-face { font-family: "VA"; src: url("/faces/entenmann-va-regular.woff2?v=4") format("woff2"); }
+  body { background: #fff; color: #111; font: 13px sans-serif; margin: 12px; }
+  #stage { position: absolute; left: -20000px; top: 0; white-space: pre; }
+  table { border-collapse: collapse; }
+  td, th { padding: 1px 10px 1px 0; text-align: right; font-variant-numeric: tabular-nums; }
+  th { color: #666; font-weight: normal; }
+  .bad { color: #b00; }
+  .gap { color: #04c; }
+  h4 { margin: 12px 0 4px; }
+</style>
+</head>
+<body>
+<h3>Chromium's own text layout against TeX's box dump (200px em, 1 unit = 0.2px)</h3>
+<div id="verdict">measuring...</div>
+<div id="report"></div>
+<div id="stage"></div>
+<script>
+var SIZE = 200;                       // px per em
+var stage = document.getElementById("stage");
+
+function el(cls, fam, text, off) {
+  var s = document.createElement("span");
+  s.style.fontFamily = '"' + fam + '", cursive';
+  s.style.fontSize = SIZE + "px";
+  if (off) s.style.fontFeatureSettings = '"calt" 0, "liga" 0';
+  s.textContent = text;
+  stage.appendChild(s);
+  return s;
+}
+
+function units(px) { return px / SIZE * 1000; }
+
+fetch("/work/tex_truth.json").then(function (r) { return r.json(); }).then(function (truth) {
+  return document.fonts.ready.then(function () {
+    var fams = Object.keys(truth);
+    // one pass of building, another of reading: the browser only knows a glyph
+    // list once every span is in the tree
+    fams.forEach(function (f) {
+      var t = truth[f], words = Object.keys(t.words);
+      t._padded = words.map(function (w) { return el("p", f, " " + w + " "); });
+      t._alone = words.map(function (w) { return el("a", f, w); });
+      t._space = el("s", f, " ");
+      t._nothing = el("n", f, "");
+    });
+    return new Promise(function (res) { setTimeout(function () { res([truth, fams]); }, 60); });
+  });
+}).then(function (ready) {
+    var truth = ready[0], fams = ready[1];
+    var rep = document.getElementById("report");
+    var sumBad = 0, maxDelta = 0;
+    fams.forEach(function (f) {
+      var t = truth[f], words = Object.keys(t.words);
+      var space = units(t._space.getBoundingClientRect().width -
+                        t._nothing.getBoundingClientRect().width);
+      var worst = 0, wrong = [];
+      words.forEach(function (w, i) {
+        var padded = units(t._padded[i].getBoundingClientRect().width) - 2 * space;
+        var alone = units(t._alone[i].getBoundingClientRect().width);
+        var d = padded - t.words[w].expect;
+        if (Math.abs(d) > Math.abs(worst)) worst = d;
+        if (Math.abs(d) > 4) wrong.push([w, t.words[w].expect, padded, d,
+                                         alone - padded]);
+        if (i === 0) {
+          var h = document.createElement("h4");
+          h.textContent = f + "  space=" + space.toFixed(1) + "u  " +
+            (t.faces.space_kerns.length ? "kerns touch the space: " +
+              JSON.stringify(t.faces.space_kerns) : "no kern touches the space");
+          rep.appendChild(h);
+          var tb = document.createElement("table");
+          tb.innerHTML = "<tr><th>word</th><th>TeX</th><th>repair</th>" +
+            "<th>expected</th><th>Chromium</th><th>Δ</th>" +
+            "<th>no padding (entry stroke a block edge cannot fire)</th></tr>";
+          rep.appendChild(tb);
+          t._tb = tb;
+        }
+        var tr = document.createElement("tr");
+        tr.innerHTML = "<td>" + w + "</td><td>" + t.words[w].tex + "</td>" +
+          "<td>" + (t.words[w].repair ? "+" + t.words[w].repair : "") + "</td>" +
+          "<td>" + t.words[w].expect + "</td>" +
+          "<td" + (Math.abs(d) > 4 ? ' class="bad"' : "") + ">" +
+          padded.toFixed(1) + "</td><td" + (Math.abs(d) > 4 ? ' class="bad"' : "") +
+          ">" + (d > 0 ? "+" : "") + d.toFixed(1) + "</td>" +
+          "<td class=\"gap\">" + (alone - padded > 4 ? (alone - padded).toFixed(0) + "u narrower" : "") +
+          "</td>";
+        t._tb.appendChild(tr);
+      });
+      sumBad += wrong.length;
+      if (Math.abs(worst) > Math.abs(maxDelta)) maxDelta = worst;
+    });
+    var v = document.getElementById("verdict");
+    v.textContent = "words checked: " +
+      fams.reduce(function (n, f) { return n + Object.keys(truth[f].words).length; }, 0) +
+      "   worst Δ " + maxDelta.toFixed(1) + " units   words over 4 units: " + sumBad;
+    v.className = sumBad ? "bad" : "";
+    document.title = (sumBad ? "DIFF " : "MATCH ") + maxDelta.toFixed(1) + "u/" + sumBad;
+}).catch(function (e) {
+  document.getElementById("verdict").textContent = "ERROR " + e;
+  document.title = "error: " + e;
+});
+</script>
+</body>
+</html>

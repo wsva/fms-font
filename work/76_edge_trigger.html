@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Does the zero-width boundary trigger open a word?</title>
+<style>
+  /* TeX pads every character list with the boundarychar, so the first word of a
+     block gets its entry stroke and the last its exit stroke. A block edge in a
+     page has no glyph there, so GSUB cannot open the word - which shows up as a
+     word that starts and ends short by exactly that stroke.
+
+     The faces now answer to U+200B in the same contexts as the space. This page
+     asks whether the trigger fires, and whether it fires for nothing: a trigger
+     that works costs its own advance (zero) and gains the stroke; one that is
+     stripped costs nothing and gains nothing, so its row reads the same as bare.
+     The space row is the reference - it must show the same stroke gain, plus the
+     advance of the space itself, which is measured separately below. */
+  @font-face { font-family: "SAS"; src: url("/faces/entenmann-sas-regular.woff2?v=6") format("woff2"); }
+  @font-face { font-family: "LA"; src: url("/faces/entenmann-la-regular.woff2?v=6") format("woff2"); }
+  body { font: 12px sans-serif; margin: 10px; }
+  .w { font-size: 60px; white-space: pre; }
+  .w.sas { font-family: "SAS", cursive; }
+  .w.la { font-family: "LA", cursive; }
+  .lab { font-family: sans-serif; font-size: 12px; color: #555; display: inline-block; width: 220px; }
+  .row { display: block; margin-bottom: 2px; }
+  h2 { font-size: 13px; margin: 14px 0 4px; }
+  table { border-collapse: collapse; margin-top: 8px; }
+  td, th { padding: 1px 12px 1px 0; text-align: right; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<table id="report"></table>
+<script>
+// "es" is the word 72 measured as losing 406 units at a block edge, so the entry
+// stroke shows without any room for argument about a hairline. Mutter/Papier end
+// in letters with a long exit stroke, so the ::after half is equally visible.
+var WORDS = ["es", "Sieben", "Papier", "Mutter"];
+// [label, ::before content, ::after content]
+var TRIG = [
+  ["none (bare)",        "",       ""],
+  ["space  /  space",    " ",      " "],
+  ["nbsp   /  nbsp",      "\u00a0", "\u00a0"],
+  ["zwsp   /  zwsp",     "\u200b", "\u200b"],
+  ["zwsp before only",   "\u200b", ""],
+  ["zwsp after only",    "",       "\u200b"],
+  ["word joiner both",   "\u2060", "\u2060"],
+];
+var FAMS = [["sas", "SAS"], ["la", "LA"]];
+
+var css = "", stage = document.getElementById("stage"), cells = {};
+FAMS.forEach(function (fam) {
+  TRIG.forEach(function (t, i) {
+    css += "." + fam[0] + ".g" + i + "::before { content: \"" + t[1] + "\"; }\n";
+    css += "." + fam[0] + ".g" + i + "::after { content: \"" + t[2] + "\"; }\n";
+  });
+  var h = document.createElement("h2");
+  h.textContent = fam[1];
+  stage.appendChild(h);
+  WORDS.forEach(function (w) {
+    TRIG.forEach(function (t, i) {
+      var row = document.createElement("div");
+      row.className = "row";
+      var lab = document.createElement("span");
+      lab.className = "lab";
+      lab.textContent = t[0] + " | " + w;
+      var s = document.createElement("span");
+      s.className = "w " + fam[0] + " g" + i;
+      s.textContent = w;
+      row.appendChild(lab);
+      row.appendChild(s);
+      stage.appendChild(row);
+      cells[fam[1] + "|" + t[0] + "|" + w] = s;
+    });
+  });
+});
+// the advance the space row pays and the trigger row does not
+var probe = document.createElement("span");
+probe.className = "w sas";
+probe.textContent = " ";
+stage.appendChild(probe);
+var st = document.createElement("style");
+st.textContent = css;
+document.head.appendChild(st);
+
+setTimeout(function () {
+  var spaceAdv = probe.getBoundingClientRect().width;
+  var rep = document.getElementById("report");
+  FAMS.forEach(function (fam) {
+    var head = document.createElement("tr");
+    head.innerHTML = "<th colspan='2'>" + fam[1] + " (space advance " +
+      spaceAdv.toFixed(1) + "px)</th>" + TRIG.slice(1).map(function (t) {
+        return "<th>" + t[0] + "</th>";
+      }).join("");
+    rep.appendChild(head);
+    WORDS.forEach(function (w) {
+      var bare = cells[fam[1] + "|none (bare)|" + w].getBoundingClientRect().width;
+      var tr = document.createElement("tr");
+      tr.innerHTML = "<td>" + w + "</td><td>" + bare.toFixed(1) + "</td>" +
+        TRIG.slice(1).map(function (t) {
+          var d = cells[fam[1] + "|" + t[0] + "|" + w].getBoundingClientRect().width - bare;
+          return "<td>+" + d.toFixed(1) + "</td>";
+        }).join("");
+      rep.appendChild(tr);
+    });
+  });
+  document.title = "see the table";
+}, 400);
+</script>
+</body>
+</html>

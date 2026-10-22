@@ -1,0 +1,47 @@
+# Diagnostics dumps the metric scripts write for eyeballing (they are reports,
+# not inputs - regenerate with work/13_metrics.py et al).
+work/out_*.txt
+work/__pycache__/
+
+# Debris - the rest of what work/ accumulates (see work/README.md). Every file
+# below is a screenshot, a run log or a generated artefact: the evidence that a
+# change worked belongs in the commit message, and the artefacts themselves
+# regenerate. The Musterblatt crops are the exception because the probes lay
+# them beside the web line as ground truth and nothing in the tree recreates
+# them.
+work/*.log
+work/*.png
+work/*.json
+work/*.xml
+work/manual.txt
+work/dom*.html
+work/out_browser.html
+work/out_*
+work/joinprobe.html
+work/preview.html
+work/_*
+work/*.ttf
+work/*.dvi
+work/*.fea
+work/*.tex
+# The shareware trial's probes: they read la-el2-schulschriften/, which is not
+# in this repo, so they cannot run from a checkout.
+work/5[0-2]_*.py
+!work/latex_title_su.png
+!work/latex_title_dn.png
+!work/latex_title_la.png
+!work/latex_title_sas.png
+!work/latex_title_va.png
+
+# The .fea the build emits, one per face, and the backups the risky steps keep
+# before they overwrite a face.
+work/features/
+work/prev/
+work/clean/
+work/el2/
+
+# The shareware trial ("LA El 2"): not ours to redistribute, and it did not
+# reproduce the LaTeX effect anyway. Its two example PDFs sit untracked in
+# examples_from_latex/ under names that are not ASCII, so they are left alone
+# rather than given an ignore rule.
+la-el2-schulschriften/

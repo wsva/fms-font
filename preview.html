@@ -40,6 +40,14 @@
   .sas { font-family: "Schulausgangsschrift Entenmann", cursive }
   .va { font-family: "Vereinfachte Ausgangsschrift Entenmann", cursive }
   .glyphs { font-size: 20px; color:#555 }
+  /* One measured line per family: the same word with the contextual alternates
+     switched off. Different widths mean the browser ran the GSUB program - the
+     joins change which glyph is used, and the forms have different advances. */
+  .probe { font-size: 20px; line-height: 1.7; color:#333; white-space: nowrap }
+  .probe .off { font-feature-settings: "calt" 0, "liga" 0 }
+  .probe em { font-family: system-ui, sans-serif; font-size: 13px; font-style: normal;
+              color:#888; margin-left: .6rem }
+  .probe.ok em { color: #0a0 }
 </style>
 </head>
 <body>
@@ -67,13 +75,45 @@
   <div class="row va">Liebe Anna, heute schreiben wir VA. <b>Fett.</b> <i>Kursiv.</i> <b><i>Fettkursiv.</i></b> 0123456789</div>
   <div class="row va glyphs">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz ÄÖÜäöüß</div></div>
 
+<h2 style="font-size:1.05rem">Ligaturprogramm (GSUB)</h2>
+<div id="probes"></div>
+
 <script>
   var fams = ["Suetterlinschrift Entenmann","Deutsche Normalschrift Entenmann","Lateinische Ausgangsschrift Entenmann","Schulausgangsschrift Entenmann","Vereinfachte Ausgangsschrift Entenmann"];
-  Promise.all(fams.map(function (f) { return document.fonts.load('16px "' + f + '"'); }))
+  // "Sieben beten" puts an e after S, b and t - three of the contexts whose
+  // alternate forms the tfm program selects, so a working program shows up here
+  // as a width difference rather than as a judgement call.
+  var PROBE = "Sieben beten oder wieder";
+  Promise.all(fams.map(function (f) { return document.fonts.load('20px "' + f + '"', PROBE); }))
+    .then(function () { return document.fonts.ready; })
     .then(function () {
+      var box = document.getElementById('probes');
+      fams.forEach(function (f) {
+        var line = document.createElement('div');
+        line.className = 'probe';
+        line.style.fontFamily = '"' + f + '", cursive';
+        var on = document.createElement('span'); on.textContent = PROBE;
+        var off = document.createElement('span'); off.className = 'off'; off.textContent = PROBE;
+        var note = document.createElement('em');
+        line.appendChild(on); line.appendChild(off); line.appendChild(note);
+        box.appendChild(line);
+      });
+      // measuring after the faces are all in place matters: a span still drawn
+      // with a fallback font gives the same width with and without calt, which
+      // would read as "the program does nothing"
+      requestAnimationFrame(function () {
+        [...box.children].forEach(function (line, i) {
+          var on = line.children[0], off = line.children[1], note = line.children[2];
+          var a = on.getBoundingClientRect().width, b = off.getBoundingClientRect().width;
+          note.textContent = fams[i].split(' ')[0] + ': ' + Math.round(a) + ' / ' + Math.round(b) + ' px  ' +
+            (Math.abs(a - b) > 1 ? '\u2714 calt wirkt' : '\u2718 calt ohne Effekt');
+          if (Math.abs(a - b) > 1) line.classList.add('ok');
+        });
+      });
+
       var missing = fams.filter(function (f) { return !document.fonts.check('16px "' + f + '"'); });
       var el = document.getElementById('status');
-      if (missing.length === 0) { el.textContent = 'Alle 5 Familien geladen ✔'; el.style.color = 'green'; }
+      if (missing.length === 0) { el.textContent = 'Alle 5 Familien geladen \u2714'; el.style.color = 'green'; }
       else { el.textContent = 'Fehlt: ' + missing.join(', '); el.style.color = 'red'; }
     });
 </script>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Rendered words, five families</title>
+<style>
+  /* Metrics are a claim; this page is the look.  The sentences are copied out of
+     font/examples_from_latex (the LaTeX PDFs are the specification), so the first
+     row of each block can be read straight against pg2-01.png.  Each word then
+     gets its own line at a size where a missing connector is obvious; every line
+     is padded with a space so GSUB can see both word boundaries (a block edge
+     cannot, which is the separate gap 72 measures). */
+  @font-face { font-family: "SU";  src: url("/faces/entenmann-su-regular.woff2?v=5") format("woff2"); }
+  @font-face { font-family: "DN";  src: url("/faces/entenmann-dn-regular.woff2?v=5") format("woff2"); }
+  @font-face { font-family: "LA";  src: url("/faces/entenmann-la-regular.woff2?v=5") format("woff2"); }
+  @font-face { font-family: "SAS"; src: url("/faces/entenmann-sas-regular.woff2?v=5") format("woff2"); }
+  @font-face { font-family: "VA";  src: url("/faces/entenmann-va-regular.woff2?v=5") format("woff2"); }
+  body { background: #fff; color: #000; margin: 0; padding: 8px 12px; }
+  h2 { font: 500 14px sans-serif; color: #333; margin: 14px 0 2px; }
+  h2:first-child { margin-top: 0; }
+  .row { white-space: pre; }
+  .sent { font-size: 40px; line-height: 1.3; }
+  .word { font-size: 66px; line-height: 1.25; }
+  .off { color: #a00; }
+</style>
+</head>
+<body>
+<div id="out"></div>
+<script>
+var FAM = ["LA", "SU", "DN", "SAS", "VA"];
+// sentences from the LaTeX example pages (oe/ue written out: the PDFs use them)
+var SENT = [
+  "Wo ist die Schweiz? Wo ist Oesterreich?",
+  "Das ist Martin Mueller aus Australien."
+];
+// the junctions that were broken and where the fix had to show: `Straße' and
+// `Mutter' fold a connector into a composite, `quantitativ' is where an entry
+// stroke once fired mid-word, `Sieben'/'geben' carry the plain inner joins
+var WORDS = ["Sieben", "geben", "Mutter", "Straße", "quantitativ", "Papier"];
+
+function line(fam, text, cls, off) {
+  var d = document.createElement("div");
+  d.className = "row " + cls;
+  d.style.fontFamily = '"' + fam + '", cursive';
+  if (off) d.style.fontFeatureSettings = '"calt" 0, "liga" 0';
+  d.textContent = " " + text + " ";
+  return d;
+}
+
+var out = document.getElementById("out");
+FAM.forEach(function (f) {
+  out.appendChild(Object.assign(document.createElement("h2"),
+    { textContent: f + " - shipped face" }));
+  SENT.forEach(function (s) { out.appendChild(line(f, s, "sent")); });
+  WORDS.forEach(function (w) { out.appendChild(line(f, w, "word")); });
+});
+out.appendChild(Object.assign(document.createElement("h2"),
+  { textContent: "LA with the joins switched off (\"calt\" 0) - what a font with no program looks like" }));
+SENT.forEach(function (s) { out.appendChild(line("LA", s, "sent", true)); });
+WORDS.forEach(function (w) { out.appendChild(line("LA", w, "word", true)); });
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>LaTeX title vs web face</title>
+<style>
+  /* The manual's Musterblaetter each open with the name of their own script, set
+     in that script by LaTeX with the METAFONT fonts. That is the only connected
+     LaTeX rendering that exists for all five families, so it is the picture to
+     match. Below each crop: the same words from the shipped woff2, once padded
+     with spaces (what GSUB needs), once bare (what a block edge gives) and once
+     padded with the zero-width trigger the page puts at a block edge. */
+  @font-face { font-family: "SU";  src: url("/faces/entenmann-su-regular.woff2?v=6") format("woff2"); }
+  @font-face { font-family: "DN";  src: url("/faces/entenmann-dn-regular.woff2?v=6") format("woff2"); }
+  @font-face { font-family: "LA";  src: url("/faces/entenmann-la-regular.woff2?v=6") format("woff2"); }
+  @font-face { font-family: "SAS"; src: url("/faces/entenmann-sas-regular.woff2?v=6") format("woff2"); }
+  @font-face { font-family: "VA";  src: url("/faces/entenmann-va-regular.woff2?v=6") format("woff2"); }
+  body { background: #fff; margin: 0; padding: 6px 8px; font: 12px sans-serif; color: #444; }
+  .fam { margin-bottom: 10px; }
+  .fam img { display: block; }
+  .row { white-space: pre; line-height: 1.1; }
+  .tag { display: inline-block; width: 46px; color: #999; font-family: sans-serif;
+         font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="out"></div>
+<script>
+var FAM = [["su", "Sütterlinschrift"], ["dn", "Dt. Normalschrift"],
+           ["la", "Lateinische Ausgangsschrift"], ["sas", "Schulausgangsschrift"],
+           ["va", "Vereinfachte Ausgangsschrift"]];
+var SIZE = Number(new URLSearchParams(location.search).get("size")) || 58;
+
+function text(fam, s, cls) {
+  var d = document.createElement("div");
+  d.className = "row";
+  d.style.fontFamily = '"' + fam.toUpperCase() + '", cursive';
+  d.style.fontSize = SIZE + "px";
+  if (cls === "off") d.style.fontFeatureSettings = '"calt" 0, "liga" 0';
+  d.innerHTML = '<span class="tag">' + cls + '</span>' + s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return d;
+}
+
+var out = document.getElementById("out");
+FAM.forEach(function (f) {
+  var box = document.createElement("div");
+  box.className = "fam";
+  var img = document.createElement("img");
+  img.src = "/work/latex_title_" + f[0] + ".png";
+  box.appendChild(img);
+  box.appendChild(text(f[0], " " + f[1] + " ", "web"));
+  box.appendChild(text(f[0], f[1], "bare"));
+  box.appendChild(text(f[0], "\u200b" + f[1] + "\u200b", "zwsp"));
+  box.appendChild(text(f[0], " " + f[1] + " ", "off"));
+  out.appendChild(box);
+});
+document.title = "pairs at " + SIZE + "px";
+</script>
+</body>
+</html>
